@@ -3,126 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>专属涩值精准测算器</title>
+    <title>妹妹的涩值测算</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:"Microsoft YaHei",sans-serif;
+        }
         body{
-            background: linear-gradient(120deg,#ffd6e0,#ffc8dd,#ffafcc);
+            background:linear-gradient(135deg,#ffe4e1,#fff0f5);
             min-height:100vh;
             display:flex;
-            align-items:center;
             justify-content:center;
+            align-items:center;
             padding:20px;
         }
         .card{
-            background:#fff;
-            padding:25px;
-            border-radius:20px;
-            box-shadow:0 8px 25px rgba(255,120,160,0.2);
-            border:2px solid #ffb6c1;
+            background:white;
+            padding:25px 20px;
+            border-radius:25px;
+            box-shadow:0 15px 30px rgba(255,105,180,0.2);
+            max-width:360px;
             width:100%;
-            max-width:420px;
+            border:4px solid #ffb6c1;
+            text-align:center;
+            position:relative;
+            z-index:2;
         }
         h1{
-            text-align:center;
-            color:#ff6b9d;
-            margin-bottom:20px;
-            font-size:20px;
+            font-size:19px;
+            color:#ff1493;
+            margin-bottom:18px;
         }
-        .input-box,.select-box{
+        input,button{
             width:100%;
-            padding:10px 13px;
-            border:2px solid #ffc0cb;
+            padding:10px 12px;
+            margin-bottom:10px;
+            border:2px solid #ffb6c1;
             border-radius:12px;
-            margin-bottom:12px;
             font-size:14px;
             outline:none;
         }
-        .input-box:focus,.select-box:focus{border-color:#ff6b9d}
+        input:focus{
+            border-color:#ff69b4;
+        }
         button{
-            width:100%;
-            padding:12px;
-            background:linear-gradient(90deg,#ff6b9d,#c8b6ff);
+            background:#ff69b4;
             color:white;
-            border:none;
-            border-radius:12px;
-            font-size:15px;
             font-weight:bold;
-            margin:8px 0 18px;
+            border:none;
             cursor:pointer;
         }
-        .result{
-            text-align:center;
-            font-size:16px;
-            color:#444;
+        button:active{
+            transform:scale(0.97);
+        }
+        .upload-btn{
+            display:inline-block;
+            width:100%;
+            padding:10px 12px;
+            margin-bottom:10px;
+            background:#ffb6c1;
+            color:#ff1493;
+            border-radius:12px;
+            font-size:14px;
             font-weight:bold;
-            min-height:35px;
+            cursor:pointer;
+            border:2px solid #ff69b4;
+        }
+        #avatar{
+            display:none;
+        }
+        #preview{
+            width:80px;
+            height:80px;
+            object-fit:cover;
+            border-radius:10px;
+            margin:8px auto;
+            display:none;
+            border:2px solid #ffb6c1;
+        }
+        .result{
+            margin-top:15px;
+            font-size:15px;
+            color:#ff1493;
+            font-weight:bold;
             line-height:1.5;
+        }
+        .heart{
+            position:fixed;
+            z-index:999;
+            pointer-events:none;
+            animation:heart 1s linear forwards;
+        }
+        @keyframes heart{
+            0%{opacity:1;transform:translate(0,0);}
+            100%{opacity:0;transform:translate(0,-100px);}
         }
     </style>
 </head>
 <body>
+
 <div class="card">
-    <h1>✨专属精准涩值缘分测算✨</h1>
-    <input type="text" class="input-box" id="name" placeholder="你的名字（不可输入：爱吃山竹口牙❤️）">
-    <input type="number" class="input-box" id="age" placeholder="你的年龄">
-    <input type="text" class="input-box" id="hobby" placeholder="你的兴趣爱好">
-    <select class="select-box" id="picType">
-        <option value="0">请选择你喜欢的图片风格</option>
-        <option value="1">清纯治愈风景/小动物</option>
-        <option value="2">可爱二次元萌系插画</option>
-        <option value="3">氛围感氛围感人像</option>
-        <option value="4">偏性感氛围感写真</option>
-    </select>
-    <button onclick="calcSeValue()">一键精准测算涩值</button>
-    <div class="result" id="show"></div>
+    <h1>✨妹妹专属涩值测算✨</h1>
+
+    <!-- 👇这里直接显示违禁词提示 -->
+    <input type="text" id="name" placeholder="输入你的名字（禁止：爱吃山竹口牙❤️）">
+    <input type="number" id="age" placeholder="输入你的年龄">
+    <input type="text" id="hobby" placeholder="输入你的爱好">
+    
+    <label class="upload-btn" for="avatar">📷 从相册选择图片</label>
+    <input type="file" id="avatar" accept="image/*" onchange="previewImg()">
+    
+    <img id="preview">
+    <button onclick="check()">开始测算涩值</button>
+    <div class="result" id="res"></div>
 </div>
 
 <script>
-// 四重维度深度智能涩值算法+违禁词风控
-function calcSeValue(){
-    let name = document.getElementById("name").value;
-    let age = document.getElementById("age").value;
-    let hobby = document.getElementById("hobby").value;
-    let picTag = Number(document.getElementById("picType").value);
+// 点击飘爱心
+document.addEventListener('click',function(e){
+    let heart = document.createElement('div');
+    heart.innerHTML = '💖';
+    heart.className = 'heart';
+    heart.style.left = e.clientX - 10 + 'px';
+    heart.style.top = e.clientY - 15 + 'px';
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),1000);
+});
 
-    // 违禁词强制拦截
-    const banWord = "爱吃山竹口牙❤️";
-    if(name.includes(banWord)){
-        document.getElementById("show").innerText="不可以输入爱吃山竹口牙❤️哟~🥺";
+// 图片预览
+function previewImg(){
+    let file = document.getElementById('avatar').files[0];
+    if(!file) return;
+    let reader = new FileReader();
+    reader.onload = function(e){
+        let img = document.getElementById('preview');
+        img.src = e.target.result;
+        img.style.display = 'block';
+    }
+    reader.readAsDataURL(file);
+}
+
+// 测算 + 违禁词检测
+function check(){
+    let name = document.getElementById('name').value.trim();
+    let age = document.getElementById('age').value.trim();
+    let hobby = document.getElementById('hobby').value.trim();
+    let hasImg = document.getElementById('avatar').files.length>0;
+    
+    let ban = "爱吃山竹口牙❤️";
+    if(name.includes(ban)){
+        document.getElementById('res').innerText = "不可以输入爱吃山竹口牙❤️哟～";
         return;
     }
-    // 空内容校验
-    if(!name||!age||!hobby||picTag==0){
-        document.getElementById("show").innerText="请把4项内容全部填写完整哦🥺";
+
+    if(!name || !age || !hobby){
+        document.getElementById('res').innerText = "请把信息填完整哦🥺";
         return;
     }
 
-    // 名字字符熵加密
-    let nameHash = 0;
-    for(let i=0;i<name.length;i++) nameHash += name.charCodeAt(i) * (i+1);
-    // 爱好涩感权重识别
-    let hobbyHash = 0;
-    for(let i=0;i<hobby.length;i++) hobbyHash += hobby.charCodeAt(i);
-    // 年龄成熟度加权
-    let ageScore = Number(age) * 9;
-    // 图片风格涩感底层标签权重（算法核心区分清纯/涩感）
-    let picScore = picTag * 18;
+    let base = 0;
+    for(let i=0;i<name.length;i++) base += name.charCodeAt(i);
+    base += Number(age)*5;
+    base += hobby.length*8;
+    if(hasImg) base +=25;
 
-    // 四维融合精准算法，0-100线性分布
-    let total = nameHash + hobbyHash + ageScore + picScore;
-    let seNum = Math.min(total % 101, 99);
+    let se = Math.abs(base%100);
+    let text = "";
 
-    // 精细化涩感分级，区分度拉满
-    let tip = "";
-    if(seNum<15) tip="白纸一张💗";
-    else if(seNum<32) tip="干净乖小孩🥰";
-    else if(seNum<50) tip="懂一点点的小乖💌";
-    else if(seNum<68) tip="瑟瑟高手💓";
-    else if(seNum<85) tip="你是精通瑟瑟的专家😍";
-    else tip="顶级天生涩感天花板😍😍😍🥰";
+    if(se<20) text="💗 清纯小白纸";
+    else if(se<40) text="🥰 有点涩涩但不多";
+    else if(se<60) text="💓 涩涩小高手";
+    else if(se<80) text="🥺 涩涩的顶级专家";
+    else text="😍😍 顶级涩值天花板";
 
-    document.getElementById("show").innerText=`你的专属精准涩值：${seNum}分 | ${tip}`;
+    document.getElementById('res').innerText = `你的涩值：${se}分\n${text}`;
 }
 </script>
 </body>
